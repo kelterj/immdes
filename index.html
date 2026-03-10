@@ -35,6 +35,7 @@
   </table>
 
   <script>
+    // Generate dates: 2026-01-01 through 2026-05-30 only
     const dates = [];
     for(let month=1; month<=5; month++) {
       const daysInMonth = month === 2 ? 28 : (month === 4 || month === 5 ? 30 : 31);
@@ -52,13 +53,16 @@
         if(r.ok) {
           foundCount++;
           const row = tbody.insertRow(0);  // Newest first
+          const modDate = r.headers.get('last-modified') ? 
+            new Date(r.headers.get('last-modified')).toLocaleString() : 
+            'Unknown';
           row.innerHTML = `
             <td class="name"><a href="${url}">${date}/</a></td>
-            <td class="date">${new Date().toLocaleString()}</td>
+            <td class="date">${modDate}</td>
             <td class="size">-</td>
           `;
         }
-      }).catch(() => {});
+      }).catch(() => {});  // Silently skip missing folders
     });
     
     setTimeout(() => {
