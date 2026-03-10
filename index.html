@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html>
-<head><title>Weekly Snapshots</title></head>
+<head><title>IMMDES 2026 Snapshots</title></head>
 <body>
-  <h1>Immdes Weekly Folders</h1>
+  <h1>2026 Weekly Folders</h1>
   <ul id="folders"></ul>
   <script>
-    // Common dated folder pattern: YYYY-MM-DD
+    // Generate dates: 2026-01-01 through 2026-05-30 only
     const dates = [];
-    for(let y=2025;y<=2026;y++)for(let m=1;m<=12;m++)for(let d=1;d<=7;d++) {
-      const date = `${y}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-      dates.push(date);
+    for(let month=1; month<=5; month++) {
+      const daysInMonth = month === 2 ? 28 : (month === 4 || month === 5 ? 30 : 31);
+      for(let day=1; day<=daysInMonth; day++) {
+        dates.push(`2026-${month.toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`);
+      }
     }
     
     const ul = document.getElementById('folders');
-    dates.slice().reverse().forEach(date => {  // Newest first
+    dates.slice().reverse().slice(0, 150).forEach(date => {  // Newest first, limit checks
       const url = `./${date}/`;
-      fetch(url, {method: 'HEAD'}).then(r => {
+      fetch(url, {method: 'HEAD', cache: 'no-cache'}).then(r => {
         if(r.ok) {
           const li = document.createElement('li');
           const a = document.createElement('a');
-          a.href = url; a.textContent = date;
-          li.appendChild(a); ul.appendChild(li);
+          a.href = url; 
+          a.textContent = date;
+          li.appendChild(a); 
+          ul.appendChild(li);
         }
-      }).catch(() => {});  // Ignore 404s
+      }).catch(() => {});  // Silently skip missing folders
     });
+    
+    // Fallback: show "Checking..." during load
+    ul.innerHTML = '<li>Scanning folders... (refresh if empty)</li>';
+    setTimeout(() => {
+      if(ul.children.length === 1) ul.innerHTML = '<li>No dated folders found yet</li>';
+    }, 10000);
   </script>
 </body>
 </html>
