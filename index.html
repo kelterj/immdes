@@ -1,13 +1,21 @@
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMMDE</title>
-</head>
+<html>
+<head><title>Weekly Snapshots</title></head>
 <body>
-    <h1>IMMDES</h1>
-    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus, dignissimos!</p>
+  <h1>Dated Folders</h1>
+  <ul id="listing"></ul>
+  <script>
+    fetch('').then(r=>r.text()).then(html=>{
+      let parser=new DOMParser(),doc=parser.parseFromString(html,'text/html');
+      let links=Array.from(doc.querySelectorAll('a[href]')).map(a=>a.href).filter(h=>h.match(/\d{4}-\d{2}-\d{2}/));
+      let ul=document.getElementById('listing');
+      links.slice(0,-1).forEach(href=>{  // Exclude this index.html itself
+        let li=document.createElement('li');
+        let a=document.createElement('a');
+        a.href=href;a.textContent=href.slice(1,-1);  // Clean path
+        li.appendChild(a);ul.appendChild(li);
+      });
+    });
+  </script>
 </body>
 </html>
