@@ -2,19 +2,27 @@
 <html>
 <head><title>Weekly Snapshots</title></head>
 <body>
-  <h1>Dated Folders</h1>
-  <ul id="listing"></ul>
+  <h1>Immdes Weekly Folders</h1>
+  <ul id="folders"></ul>
   <script>
-    fetch('').then(r=>r.text()).then(html=>{
-      let parser=new DOMParser(),doc=parser.parseFromString(html,'text/html');
-      let links=Array.from(doc.querySelectorAll('a[href]')).map(a=>a.href).filter(h=>h.match(/\d{4}-\d{2}-\d{2}/));
-      let ul=document.getElementById('listing');
-      links.slice(0,-1).forEach(href=>{  // Exclude this index.html itself
-        let li=document.createElement('li');
-        let a=document.createElement('a');
-        a.href=href;a.textContent=href.slice(1,-1);  // Clean path
-        li.appendChild(a);ul.appendChild(li);
-      });
+    // Common dated folder pattern: YYYY-MM-DD
+    const dates = [];
+    for(let y=2025;y<=2026;y++)for(let m=1;m<=12;m++)for(let d=1;d<=7;d++) {
+      const date = `${y}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+      dates.push(date);
+    }
+    
+    const ul = document.getElementById('folders');
+    dates.slice().reverse().forEach(date => {  // Newest first
+      const url = `./${date}/`;
+      fetch(url, {method: 'HEAD'}).then(r => {
+        if(r.ok) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = url; a.textContent = date;
+          li.appendChild(a); ul.appendChild(li);
+        }
+      }).catch(() => {});  // Ignore 404s
     });
   </script>
 </body>
